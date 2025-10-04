@@ -30,15 +30,20 @@ class IndependentSolver(object):
         result = []
 
         # forbid agent 0 from being at its goal at t=10
-        special = [{"agent": 0, "loc": [self.goals[0]], "timestep": 10}]
+        # special = [{"agent": 0, "loc": [self.goals[0]], "timestep": 10}]
+        blank = []
 
         ##############################
         # Task 0: Understand the following code (see the lab description for some hints)
 
         for i in range(self.num_of_agents):  # Find path for each agent
-            cons = special if i == 0 else []  # only agent 0 constrained
+            # cons = special if i == 0 else []  # only agent 0 constrained
+            cons = blank  # only agent 0 constrained
             path = a_star(self.my_map, self.starts[i], self.goals[i], self.heuristics[i],
                           i, cons)
+
+            print(f"agent {i}")
+
             if path is None:
                 raise BaseException('No solutions')
             result.append(path)
