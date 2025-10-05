@@ -47,6 +47,8 @@ class PrioritizedPlanningSolver(object):
 
             skyIsTheLimit = validSquares + distanceToGoal + currentLineLength
 
+            constraints.append({"agent": i, "maxTime": skyIsTheLimit})
+
             path = a_star(self.my_map, self.starts[i], self.goals[i], self.heuristics[i],
                           i, constraints)
             if path is None:
