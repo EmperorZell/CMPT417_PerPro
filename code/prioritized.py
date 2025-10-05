@@ -57,20 +57,7 @@ class PrioritizedPlanningSolver(object):
 
                     if t > 0:
                         prevLocation = path[t - 1]
-                    # else:
-                    #     prevLocation = path[t]
-
-                        # trying something here so that there is no locloc (first one is cant be together, second one is cant go against)
-                        # constraints.append({"agent": j, "loc": [prevLocation, currentLoc], "timestep": t-1})
                         constraints.append({"agent": j, "loc": [currentLoc, prevLocation], "timestep": t})
-
-                    # if t < len(path) - 1:
-                    #     nextLocation = path[t + 1]
-                    # else:
-                    #     nextLocation = path[t]
-                    #
-                    # constraints.append({"agent": j, "loc": [prevLocation, currentLoc], "timestep": t})
-                    # constraints.append({"agent": j, "loc": [currentLoc, prevLocation], "timestep": t})
 
                 # might need to change chungus to something else like inf and add something to limit it if stuck forever
                 chungus = 100
