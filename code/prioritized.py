@@ -35,6 +35,18 @@ class PrioritizedPlanningSolver(object):
         constraints = []
 
         for i in range(self.num_of_agents):  # Find path for each agent
+
+            # Create a "worst" time for any agent by adding all the avaiable movement spaces, the times of the previous...
+            # agents and the shortest distance to the goal from start
+
+            # Saves the dimensions of the map
+            rows, columns = len(self.my_map[1]), len(self.my_map[0])
+            validSquares = sum(not self.my_map[i][j] for j in range(columns) for j in range(rows))
+            distanceToGoal = self.heuristics[i][self.starts[i]]
+            currentLineLength = sum(len(path) - 1 for path in result)
+
+            skyIsTheLimit = validSquares + distanceToGoal + currentLineLength
+
             path = a_star(self.my_map, self.starts[i], self.goals[i], self.heuristics[i],
                           i, constraints)
             if path is None:
@@ -57,28 +69,14 @@ class PrioritizedPlanningSolver(object):
 
                     if t > 0:
                         prevLocation = path[t - 1]
-                    # else:
-                    #     prevLocation = path[t]
-
-                        # trying something here so that there is no locloc (first one is cant be together, second one is cant go against)
-                        # constraints.append({"agent": j, "loc": [prevLocation, currentLoc], "timestep": t-1})
                         constraints.append({"agent": j, "loc": [currentLoc, prevLocation], "timestep": t})
 
-                    # if t < len(path) - 1:
-                    #     nextLocation = path[t + 1]
-                    # else:
-                    #     nextLocation = path[t]
-                    #
-                    # constraints.append({"agent": j, "loc": [prevLocation, currentLoc], "timestep": t})
-                    # constraints.append({"agent": j, "loc": [currentLoc, prevLocation], "timestep": t})
-
-                # might need to change chungus to something else like inf and add something to limit it if stuck forever
-                chungus = 100
-                goalLocation = path[len(path) - 1];
-                fishyCeiling = len(path) + chungus
-                for t in range(len(path), fishyCeiling):
-                    constraints.append({"agent": j, "loc": [goalLocation], "timestep": t})
-
+                # # might need to change chungus to something else like inf and add something to limit it if stuck forever
+                # chungus = 100
+                # goalLocation = path[len(path) - 1];
+                # fishyCeiling = len(path) + chungus
+                # for t in range(len(path), fishyCeiling):
+                #     constraints.append({"agent": j, "loc": [goalLocation], "timestep": t})
 
             ##############################
 
