@@ -175,8 +175,10 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
     # earliestGoalTime = max(constraintTable.keys()) if constraintTable else 0
     lastTimeBlocked = -1
     for t, entry in constraintTable.items():
-        if tuple(goal_loc) in entry["vertex"]:
-            lastTimeBlocked = max(lastTimeBlocked, t)
+        if isinstance(t, int) and isinstance(entry, dict):
+            if tuple(goal_loc) in entry.get("vertex", set()):
+                if t > lastTimeBlocked:
+                    lastTimeBlocked = t
 
     open_list = []
     closed_list = dict()

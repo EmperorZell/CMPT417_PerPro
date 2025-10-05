@@ -40,8 +40,8 @@ class PrioritizedPlanningSolver(object):
             # agents and the shortest distance to the goal from start
 
             # Saves the dimensions of the map
-            rows, columns = len(self.my_map[1]), len(self.my_map[0])
-            validSquares = sum(not self.my_map[i][j] for j in range(columns) for j in range(rows))
+            rows, columns = len(self.my_map), len(self.my_map[0])
+            validSquares = sum(not self.my_map[r][c] for r in range(rows) for c in range(columns))
             distanceToGoal = self.heuristics[i][self.starts[i]]
             currentLineLength = sum(len(path) - 1 for path in result)
 
@@ -74,11 +74,11 @@ class PrioritizedPlanningSolver(object):
                         constraints.append({"agent": j, "loc": [currentLoc, prevLocation], "timestep": t})
 
                 # # might need to change chungus to something else like inf and add something to limit it if stuck forever
-                # chungus = 100
-                # goalLocation = path[len(path) - 1];
-                # fishyCeiling = len(path) + chungus
-                # for t in range(len(path), fishyCeiling):
-                #     constraints.append({"agent": j, "loc": [goalLocation], "timestep": t})
+                chungus = 100
+                goalLocation = path[len(path) - 1];
+                fishyCeiling = len(path) + chungus
+                for t in range(len(path), fishyCeiling):
+                    constraints.append({"agent": j, "loc": [goalLocation], "timestep": t})
 
             ##############################
 
