@@ -43,6 +43,33 @@ class PrioritizedPlanningSolver(object):
             #            * path contains the solution path of the current (i'th) agent, e.g., [(1,1),(1,2),(1,3)]
             #            * self.num_of_agents has the number of total agents
             #            * constraints: array of constraints to consider for future A* searches
+            for j in range (i + 1, self.num_of_agents):
+                for t, loc, in enumerate(path):
+                    # Future agents can not be on the same vertex at the same time
+                    constraints.append({"agent": j, "loc": [loc], "timestep": t})
+
+                    # can not move with or through each other
+                    currentLoc = loc
+
+                    if t > 0:
+                        prevLocation = path[t - 1]
+                    else:
+                        prevLocation = path[t]
+
+                    # if t < len(path) - 1:
+                    #     nextLocation = path[t + 1]
+                    # else:
+                    #     nextLocation = path[t]
+
+                    constraints.append({"agent": j, "loc": [prevLocation, currentLoc], "timestep": t})
+                    constraints.append({"agent": j, "loc": [currentLoc, prevLocation], "timestep": t})
+
+                # might need to change chungus to something else like inf and add something to limit it if stuck forever
+                chungus = 100
+                goalLocation = path[len(path) - 1];
+                fishyCeiling = len(path) + chungus
+                for t in range(len(path), fishyCeiling):
+                    constraints.append({"agent": j, "loc": [goalLocation], "timestep": t})
 
 
             ##############################

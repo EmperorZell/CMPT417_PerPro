@@ -31,18 +31,26 @@ class IndependentSolver(object):
 
         # forbid agent 0 from being at its goal at t=10
         # special = [{"agent": 0, "loc": [self.goals[0]], "timestep": 10}]
-        blank = []
+        # blank = []
+        task1_5_Constraint = [
+
+                              {"agent": 1, "loc": [(1, 3), (1, 4)], "timestep": 2},
+                              {"agent": 1, "loc": [(1, 3)], "timestep": 2},
+                              {"agent": 1, "loc": [(1, 2), (1, 3)], "timestep": 3},
+
+                              ]
 
         ##############################
         # Task 0: Understand the following code (see the lab description for some hints)
 
         for i in range(self.num_of_agents):  # Find path for each agent
             # cons = special if i == 0 else []  # only agent 0 constrained
-            cons = blank  # only agent 0 constrained
+            # cons = blank  # only agent 0 constrained
+            cons = task1_5_Constraint.copy()
             path = a_star(self.my_map, self.starts[i], self.goals[i], self.heuristics[i],
                           i, cons)
 
-            print(f"agent {i}")
+            print(f"agent {i} path:", path) # We see that at time 2 agent 0 and 1 collide so we need a restriction for that
 
             if path is None:
                 raise BaseException('No solutions')

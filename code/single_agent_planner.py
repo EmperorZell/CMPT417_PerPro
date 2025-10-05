@@ -158,11 +158,15 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
         return validMoves
 
     constraintTable = build_constraint_table(constraints, agent)
-    earliestGoalTime = max(constraintTable.keys()) if constraintTable else 0
+    # earliestGoalTime = max(constraintTable.keys()) if constraintTable else 0
+    lastTimeBlocked = -1
+    for t, entry in constraintTable.items():
+        if tuple(goal_loc) in entry["vertex"]:
+            lastTimeBlocked = max(lastTimeBlocked, t)
 
     open_list = []
     closed_list = dict()
-    #earliest_goal_timestep = 0
+    # earliest_goal_timestep = 0
     h_value = h_values[start_loc]
     root = {'loc': start_loc, 't':0, 'g_val': 0, 'h_val': h_value, 'parent': None}
     push_node(open_list, root)
@@ -175,7 +179,7 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
         # if curr['loc'] == goal_loc:
         #     return get_path(curr)
 
-        if curr['loc'] == goal_loc and curr['t'] >= earliestGoalTime:
+        if curr['loc'] == goal_loc and curr['t'] >= lastTimeBlocked:
             entry = constraintTable.get(curr['t'])
             if not entry or (tuple(goal_loc) not in entry['vertex']):
                 return get_path(curr)
