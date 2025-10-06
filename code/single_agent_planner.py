@@ -55,10 +55,16 @@ def build_constraint_table(constraints, agent):
     #               is_constrained function.
 
     table = {}
+    maxTime = None
     for c in constraints or []:
 
         # If the current agent is the wrong agent for the constraints dont do anything
         if c["agent"] != agent:
+            continue
+
+        # If max time is an arg, take the arg or the current max time vs the input
+        if "maxTime" in c:
+            maxTime = c["maxTime"] if maxTime is None else min(maxTime, c["maxTime"])
             continue
 
         # Otherwise, save the timestep and the location
@@ -70,6 +76,9 @@ def build_constraint_table(constraints, agent):
             entry["vertex"].add(tuple(locs[0])) # cant be here
         else:
             entry["edge"].add((tuple(locs[0]), tuple(locs[1]))) # cant do this
+
+    if maxTime is not None:
+        table["maxTime"] = maxTime
     return table
 
 
@@ -97,6 +106,11 @@ def is_constrained(curr_loc, next_loc, next_time, constraint_table):
     # Task 1.2/1.3: Check if a move from curr_loc to next_loc at time step next_time violates
     #               any given constraint. For efficiency the constraints are indexed in a constraint_table
     #               by time step, see build_constraint_table.
+
+    # Global Time Cap
+    maxTime = constraint_table.get("maxTime")
+    if maxTime is not None and next_time > maxTime:
+        return True
 
     entry = constraint_table.get(next_time)
     if not entry:
@@ -161,8 +175,10 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
     # earliestGoalTime = max(constraintTable.keys()) if constraintTable else 0
     lastTimeBlocked = -1
     for t, entry in constraintTable.items():
-        if tuple(goal_loc) in entry["vertex"]:
-            lastTimeBlocked = max(lastTimeBlocked, t)
+        if isinstance(t, int) and isinstance(entry, dict):
+            if tuple(goal_loc) in entry.get("vertex", set()):
+                if t > lastTimeBlocked:
+                    lastTimeBlocked = t
 
     open_list = []
     closed_list = dict()
