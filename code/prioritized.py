@@ -75,11 +75,6 @@ class PrioritizedPlanningSolver(object):
                 fishyCeiling = len(path) + chungus
                 for t in range(len(path), fishyCeiling):
                     constraints.append({"agent": j, "loc": [goalLocation], "timestep": t})
-
-                print(f"\nConstraints before planning agent {i}:")
-                for c in constraints:
-                    print(c)
-
             ##############################
 
         self.CPU_time = timer.time() - start_time
