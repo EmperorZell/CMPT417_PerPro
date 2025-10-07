@@ -1,8 +1,4 @@
 import time as timer
-
-import numpy as np
-from numpy.core.numeric import infty, Infinity
-
 from single_agent_planner import compute_heuristics, a_star, get_sum_of_cost
 
 
@@ -79,6 +75,10 @@ class PrioritizedPlanningSolver(object):
                 fishyCeiling = len(path) + chungus
                 for t in range(len(path), fishyCeiling):
                     constraints.append({"agent": j, "loc": [goalLocation], "timestep": t})
+
+                print(f"\nConstraints before planning agent {i}:")
+                for c in constraints:
+                    print(c)
 
             ##############################
 

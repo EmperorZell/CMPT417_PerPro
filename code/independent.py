@@ -45,7 +45,7 @@ class IndependentSolver(object):
 
         for i in range(self.num_of_agents):  # Find path for each agent
             # cons = special if i == 0 else []  # only agent 0 constrained
-            # cons = blank  # only agent 0 constrained
+            # cons = []  # only agent 0 constrained
             cons = task1_5_Constraint.copy()
             path = a_star(self.my_map, self.starts[i], self.goals[i], self.heuristics[i],
                           i, cons)
