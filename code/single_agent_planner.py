@@ -54,6 +54,7 @@ def build_constraint_table(constraints, agent):
     #               for a more efficient constraint violation check in the 
     #               is_constrained function.
 
+    # Initialization
     table = {}
     maxTime = None
     for c in constraints or []:
