@@ -177,7 +177,7 @@ class CBSSolver(object):
         while self.open_list:
             node = self.pop_node()
 
-            if len[node['constraints']] == 0:
+            if len(node['collisions']) == 0:
                 self.print_results(node)
                 return node['paths']
 
@@ -187,9 +187,19 @@ class CBSSolver(object):
 
             for constraint in newConstraints:
                 child = {
-
+                    'constraints': node['constraints'] + [constraint],
+                    'paths': list(node['paths']),
                 }
 
+                i = constraint['agent']
+                replan = a_star(self.my_map, self.starts[i], self.goals[i], self.heuristics[i], i, child['constraints'])
+                if replan is None:
+                    continue
+
+                child['paths'][i] = replan
+                child['cost'] = get_sum_of_cost(child['paths'])
+                child['collisions'] = detect_collisions(child['paths'])
+                self.push_node(child)
 
         self.print_results(root)
         return root['paths']
