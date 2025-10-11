@@ -57,6 +57,7 @@ def build_constraint_table(constraints, agent):
     # Initialization
     table = {}
     maxTime = None
+
     for c in constraints or []:
 
         # If the current agent is the wrong agent for the constraints dont do anything
@@ -72,11 +73,17 @@ def build_constraint_table(constraints, agent):
         t = c["timestep"]
         locs = c["loc"]
 
-        entry = table.setdefault(t, {"vertex": set(), "edge": set()})
+        entry = table.setdefault(t, {"vertex": set(), "edge": set(), "positive_vertex": set(), "positive_edge": set()})
         if len(locs) == 1:
-            entry["vertex"].add(tuple(locs[0])) # cant be here
+            if "positive" in c and c["positive"] == True:
+                entry["positive_vertex"].add(tuple(locs[0])) # location in question
+            else:
+                entry["vertex"].add(tuple(locs[0]))  # location in question
         else:
-            entry["edge"].add((tuple(locs[0]), tuple(locs[1]))) # cant do this
+            if "positive" in c:
+                entry["positive_edge"].add((tuple(locs[0]), tuple(locs[1])))  # edge in question
+            else:
+                entry["edge"].add((tuple(locs[0]), tuple(locs[1])))
 
     if maxTime is not None:
         table["maxTime"] = maxTime
@@ -121,6 +128,13 @@ def is_constrained(curr_loc, next_loc, next_time, constraint_table):
         return True
 
     if (tuple(curr_loc), tuple(next_loc)) in entry["edge"]:
+        return True
+
+    # 4.1
+    if entry["positive_vertex"] and tuple(next_loc) not in entry["positive_vertex"]:
+        return True
+
+    if entry["positive_edge"] and (tuple(curr_loc), tuple(next_loc)) not in entry["positive_edge"]:
         return True
 
     return False

@@ -65,20 +65,16 @@ def standard_splitting(collision):
     if len(loc) == 1: # vertex constraint
         v = loc[0]
         return [
-            {'agent': a1, 'loc': loc, 'timestep': timestep,},
-            {'agent': a2, 'loc': loc, 'timestep': timestep,}
+            {'agent': a1, 'loc': [v], 'timestep': timestep},
+            {'agent': a2, 'loc': [v], 'timestep': timestep},
         ]
 
-    elif len(loc) == 2:
-        prev = loc[0]
-        curr = loc[1]
+    else:
+        prev, curr = loc
         return [
-            {'agent': a1, 'loc': [prev, curr], 'timestep': timestep,},
-            {'agent': a2, 'loc': [prev, curr], 'timestep': timestep,}
+            {'agent': a1, 'loc': [prev, curr], 'timestep': timestep},
+            {'agent': a2, 'loc': [curr, prev], 'timestep': timestep},
         ]
-
-    return None
-
 
 def disjoint_splitting(collision):
     ##############################
@@ -91,8 +87,29 @@ def disjoint_splitting(collision):
     #                          specified edge at the specified timestep
     #           Choose the agent randomly
 
-    pass
+    theCoinOfAllTime = random.choice(['a1', 'a2'])
+    aChoice = collision[theCoinOfAllTime]
+    timestep = collision['timestep']
+    loc = collision['loc']
 
+    if len(loc) == 1: # vertex constraint
+        v = loc[0]
+        return [
+            {'agent': aChoice, 'loc': [v], 'timestep': timestep},
+            {'agent': aChoice, 'loc': [v], 'timestep': timestep, 'positive': True},
+        ]
+
+    else:
+        prev, curr = loc
+        if theCoinOfAllTime == 'a1':
+            return [
+                {'agent': aChoice, 'loc': [prev, curr], 'timestep': timestep},
+                {'agent': aChoice, 'loc': [prev, curr], 'timestep': timestep, 'positive': True},
+            ]
+        return [
+            {'agent': aChoice, 'loc': [curr, prev], 'timestep': timestep},
+            {'agent': aChoice, 'loc': [curr, prev], 'timestep': timestep, 'positive': True},
+        ]
 
 class CBSSolver(object):
     """The high-level search of CBS."""
@@ -130,7 +147,7 @@ class CBSSolver(object):
         self.num_of_expanded += 1
         return node
 
-    def find_solution(self, disjoint=True):
+    def find_solution(self, disjoint=False):
         """ Finds paths for all agents from their start locations to their goal locations
 
         disjoint    - use disjoint splitting or not
