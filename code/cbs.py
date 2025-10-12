@@ -204,7 +204,7 @@ class CBSSolver(object):
             newConstraints = (disjoint_splitting(collision) if disjoint
                 else standard_splitting(collision))
 
-            if disjoint:
+            if not disjoint:
                 for constraint in newConstraints:
                     child = {
                         'constraints': node['constraints'] + [constraint],
@@ -229,58 +229,52 @@ class CBSSolver(object):
 
                     if 'positive' in constraint and constraint['positive'] == True:
                         violatingAgents = paths_violate_constraint(constraint, node['paths'])
+                        t = constraint['timestep']
 
-                        for each in violatingAgents:
-
-                            if len(constraint['loc']) == 1:
+                        if len(constraint['loc']) == 1:
+                            for each in violatingAgents:
                                 child['constraints'].append(
                                     {'agent': each,
                                      'loc': constraint['loc'],
-                                     'timestep': constraint['timestep']
+                                     'timestep': t
                                      }
                                 )
-                            else:
+                        else:
+                            for each in violatingAgents:
                                 prev, curr = get_location(node['paths'][each], constraint['timestep']-1), get_location(node['paths'][each], constraint['timestep'])
                                 child['constraints'].append(
                                     {'agent': each,
                                      'loc': [prev, curr],
-                                     'timestep': constraint['timestep']
+                                     'timestep': t
                                      }
                                 )
 
                         agentsToReplan = {constraint['agent']} | set(violatingAgents)
 
-                        for agents in agentsToReplan:
-                            replan = a_star(self.my_map,
-                                            self.starts[agents],
-                                            self.goals[agents],
-                                            self.heuristics[agents],
-                                            agents,
-                                            child['constraints']
-                                            )
-
-                            if replan is None:
-                                break
-                            child['paths'][agents] = replan
-
-                        child['cost'] = get_sum_of_cost(child['paths'])
-                        child['collisions'] = detect_collisions(child['paths'])
-                        self.push_node(child)
-
-
                     else:
-                        i = constraint['agent']
-                        replan = a_star(self.my_map, self.starts[i], self.goals[i], self.heuristics[i], i,
-                                        child['constraints'])
+                        agentsToReplan = {constraint['agent']}
+
+                    deathToChildren = False
+                    for agents in agentsToReplan:
+                        replan = a_star(self.my_map,
+                                        self.starts[agents],
+                                        self.goals[agents],
+                                        self.heuristics[agents],
+                                        agents,
+                                        child['constraints']
+                                        )
+
                         if replan is None:
-                            continue
+                            deathToChildren = True
+                            break
+                        child['paths'][agents] = replan
 
-                        child['paths'][i] = replan
-                        child['cost'] = get_sum_of_cost(child['paths'])
-                        child['collisions'] = detect_collisions(child['paths'])
-                        self.push_node(child)
+                    if deathToChildren:
+                        continue
 
-
+                    child['cost'] = get_sum_of_cost(child['paths'])
+                    child['collisions'] = detect_collisions(child['paths'])
+                    self.push_node(child)
 
 
         self.print_results(root)
