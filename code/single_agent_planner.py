@@ -80,7 +80,7 @@ def build_constraint_table(constraints, agent):
             else:
                 entry["vertex"].add(tuple(locs[0]))  # location in question
         else:
-            if "positive" in c:
+            if "positive" in c and c["positive"] == True:
                 entry["positive_edge"].add((tuple(locs[0]), tuple(locs[1])))  # edge in question
             else:
                 entry["edge"].add((tuple(locs[0]), tuple(locs[1])))
