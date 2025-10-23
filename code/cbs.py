@@ -2,8 +2,25 @@ import time as timer
 import heapq
 import random
 
-from paths_violate_constraint import paths_violate_constraint
+# from paths_violate_constraint import paths_violate_constraint
 from single_agent_planner import compute_heuristics, a_star, get_location, get_sum_of_cost
+
+def paths_violate_constraint(constraint, paths):
+    assert constraint['positive'] is True
+    rst = []
+    for i in range(len(paths)):
+        if i == constraint['agent']:
+            continue
+        curr = get_location(paths[i], constraint['timestep'])
+        prev = get_location(paths[i], constraint['timestep'] - 1)
+        if len(constraint['loc']) == 1:  # vertex constraint
+            if constraint['loc'][0] == curr:
+                rst.append(i)
+        else:  # edge constraint
+            if constraint['loc'][0] == prev or constraint['loc'][1] == curr \
+                    or constraint['loc'] == [curr, prev]:
+                rst.append(i)
+    return rst
 
 
 def detect_collision(path1, path2):
@@ -193,6 +210,7 @@ class CBSSolver(object):
         #                standard_splitting function). Add a new child node to your open list for each constraint
         #           Ensure to create a copy of any objects that your child nodes might inherit
 
+        # disjoint = True
         while self.open_list:
             node = self.pop_node()
 
@@ -204,6 +222,7 @@ class CBSSolver(object):
             newConstraints = (disjoint_splitting(collision) if disjoint
                 else standard_splitting(collision))
 
+            print("Using disjoint splitting:", disjoint)
             if not disjoint:
                 for constraint in newConstraints:
                     child = {

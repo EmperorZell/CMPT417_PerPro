@@ -69,13 +69,13 @@ class PrioritizedPlanningSolver(object):
                         prevLocation = path[t - 1]
                         constraints.append({"agent": j, "loc": [currentLoc, prevLocation], "timestep": t})
 
-                # # might need to change chungus to something else like inf and add something to limit it if stuck forever
+                # might need to change chungus to something else like inf and add something to limit it if stuck forever
                 chungus = 100
-                goalLocation = path[len(path) - 1];
+                goalLocation = path[len(path) - 1]
                 fishyCeiling = len(path) + chungus
                 for t in range(len(path), fishyCeiling):
                     constraints.append({"agent": j, "loc": [goalLocation], "timestep": t})
-            ##############################
+                ##############################
 
         self.CPU_time = timer.time() - start_time
 

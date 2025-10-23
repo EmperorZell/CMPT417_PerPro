@@ -167,7 +167,7 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
     #           rather than space domain, only.
 
     # Checks if the next move is within bounds
-    def in_bounds(loc):
+    def inBounds(loc):
         r, c = loc
         return 0 <= r < len(my_map) and 0 <= c < len(my_map[0])
 
@@ -176,18 +176,24 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
         r, c = loc
         return not my_map[r][c]
 
-    def neighbours_plus_wait(loc):
+    def neighbourPlusWait(loc):
         r, c = loc
         # wait in place + 4-neighbours
         dirPlusWait = [(r, c), (r, c-1), (r+1, c), (r, c+1), (r-1, c)]
         validMoves = []
         for n in dirPlusWait:
-            if in_bounds(n) and passable(n):
+            if inBounds(n) and passable(n):
                 validMoves.append(n)
         return validMoves
 
     constraintTable = build_constraint_table(constraints, agent)
     # earliestGoalTime = max(constraintTable.keys()) if constraintTable else 0
+    latest_required_t = 0
+    for t, entry in constraintTable.items():
+        if isinstance(t, int):
+            if (entry.get("positive_vertex") or entry.get("positive_edge")):
+                if t > latest_required_t:
+                    latest_required_t = t
     lastTimeBlocked = -1
     for t, entry in constraintTable.items():
         if isinstance(t, int) and isinstance(entry, dict):
@@ -210,12 +216,13 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
         # if curr['loc'] == goal_loc:
         #     return get_path(curr)
 
-        if curr['loc'] == goal_loc and curr['t'] >= lastTimeBlocked:
+        # AND the goal isn't vertex-forbidden at that exact time.
+        if curr['loc'] == goal_loc and curr['t'] >= max(latest_required_t, lastTimeBlocked):
             entry = constraintTable.get(curr['t'])
             if not entry or (tuple(goal_loc) not in entry['vertex']):
                 return get_path(curr)
 
-        for child_loc in neighbours_plus_wait(curr['loc']):
+        for child_loc in neighbourPlusWait(curr['loc']):
             # Compute next time
             child_t = curr['t'] + 1
 
