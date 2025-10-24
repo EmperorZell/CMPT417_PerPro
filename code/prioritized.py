@@ -30,20 +30,23 @@ class PrioritizedPlanningSolver(object):
         result = []
         constraints = []
 
+        # Create a "worst" time for any agent by adding all the available movement spaces, the times of the previous...
+        # agents and the shortest distance to the goal from start
+
+        # Saves the dimensions of the map
+        rows, columns = len(self.my_map), len(self.my_map[0])
+        validSquares = sum(not self.my_map[r][c] for r in range(rows) for c in range(columns))
+        skyIsTheLimit = validSquares
+
+        totalTimeShortestAgents = 0
+        for i in range(self.num_of_agents):
+            shortestDistanceToGoalAgent = self.heuristics[i][self.starts[i]]
+            totalTimeShortestAgents += validSquares + shortestDistanceToGoalAgent
+
+        for i in range(self.num_of_agents):
+            constraints.append({"agent": i, "maxTime": skyIsTheLimit+totalTimeShortestAgents})
+
         for i in range(self.num_of_agents):  # Find path for each agent
-
-            # Create a "worst" time for any agent by adding all the avaiable movement spaces, the times of the previous...
-            # agents and the shortest distance to the goal from start
-
-            # Saves the dimensions of the map
-            rows, columns = len(self.my_map), len(self.my_map[0])
-            validSquares = sum(not self.my_map[r][c] for r in range(rows) for c in range(columns))
-            distanceToGoal = self.heuristics[i][self.starts[i]]
-            currentLineLength = sum(len(path) - 1 for path in result)
-
-            skyIsTheLimit = validSquares + distanceToGoal + currentLineLength
-
-            constraints.append({"agent": i, "maxTime": skyIsTheLimit})
 
             path = a_star(self.my_map, self.starts[i], self.goals[i], self.heuristics[i],
                           i, constraints)
@@ -70,7 +73,7 @@ class PrioritizedPlanningSolver(object):
                         constraints.append({"agent": j, "loc": [currentLoc, prevLocation], "timestep": t})
 
                 # might need to change chungus to something else like inf and add something to limit it if stuck forever
-                chungus = 100
+                chungus = skyIsTheLimit + totalTimeShortestAgents
                 goalLocation = path[len(path) - 1]
                 fishyCeiling = len(path) + chungus
                 for t in range(len(path), fishyCeiling):

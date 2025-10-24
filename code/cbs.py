@@ -210,6 +210,7 @@ class CBSSolver(object):
         #                standard_splitting function). Add a new child node to your open list for each constraint
         #           Ensure to create a copy of any objects that your child nodes might inherit
 
+        print("Using disjoint splitting:", disjoint)
         # disjoint = True
         while self.open_list:
             node = self.pop_node()
@@ -222,7 +223,7 @@ class CBSSolver(object):
             newConstraints = (disjoint_splitting(collision) if disjoint
                 else standard_splitting(collision))
 
-            print("Using disjoint splitting:", disjoint)
+
             if not disjoint:
                 for constraint in newConstraints:
                     child = {
@@ -239,6 +240,7 @@ class CBSSolver(object):
                     child['cost'] = get_sum_of_cost(child['paths'])
                     child['collisions'] = detect_collisions(child['paths'])
                     self.push_node(child)
+
             else:
                 for constraint in newConstraints:
                     child = {
@@ -258,6 +260,7 @@ class CBSSolver(object):
                                      'timestep': t
                                      }
                                 )
+
                         else:
                             for each in violatingAgents:
                                 prev, curr = get_location(node['paths'][each], constraint['timestep']-1), get_location(node['paths'][each], constraint['timestep'])

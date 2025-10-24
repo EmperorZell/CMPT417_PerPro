@@ -191,9 +191,10 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
     latest_required_t = 0
     for t, entry in constraintTable.items():
         if isinstance(t, int):
-            if (entry.get("positive_vertex") or entry.get("positive_edge")):
+            if entry.get("positive_vertex") or entry.get("positive_edge"):
                 if t > latest_required_t:
                     latest_required_t = t
+
     lastTimeBlocked = -1
     for t, entry in constraintTable.items():
         if isinstance(t, int) and isinstance(entry, dict):
